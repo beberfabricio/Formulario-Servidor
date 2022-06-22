@@ -3,6 +3,7 @@ function llenarVariables() {
     modal = document.getElementById("sctModal");
     modalClose = document.getElementById("btnModalC");
     modalpName = document.getElementById("pName");
+    modalpText = document.getElementById("pText");
     nombre = document.getElementById("txtNombre");
     apellido = document.getElementById("txtApellido");
     email = document.getElementById("txtEmail");
@@ -16,6 +17,7 @@ function llenarVariables() {
     textList = document.querySelectorAll("input[type=text]");
     radioList = document.querySelectorAll("input[type=radio]");
     checkList = document.querySelectorAll("input[type=checkbox]");
+    num = 0;
 }
 
 window.onload = () => {
@@ -23,17 +25,7 @@ window.onload = () => {
     submit.onclick = function (e) { //cuando se presiona el boton enviar, realiza lo siguiente:
         e.preventDefault();
         if (validarCampos() == true) { //ejecuta la funcion validarCampos, en caso de estar correctos, ejecuta el if
-            //httpRequest
-            modalpName.innerText = nombre.value.concat(" ", apellido.value); //envia nombre y apellido registrados al modal
-            modal.classList.add("modal-show"); //muestra el modal
-            modalClose.onclick = function(){ //cuando se presiona el boton cerrar del modal
-                modal.classList.remove("modal-show"); //lo cierra
-            }
-            window.onclick = function(e) { //cuando se presiona cualquier parte fuera del modal
-                if (e.target == modal) {
-                    modal.classList.remove("modal-show"); //lo cierra
-                }
-            }
+            enviarRequest(mostrarModal);
         } else {
             window.alert("Hay errores en al menos un campo."); //si hay algun campo mal, muestra el alert
         }
@@ -96,5 +88,35 @@ function ocultarLabels(){
 
     pais.onchange = function(){ //oculta label del pais cuando cambia
         errorP.classList.toggle("hidden",true);
+    }
+}
+
+function enviarRequest(fn){
+    const url = "https://curso-dev-2021.herokuapp.com/newsletter/?";
+    const request = new XMLHttpRequest();
+    request.open("GET", url+"name="+nombre.value+"&surname="+apellido.value+"&email="+email.value+"&edad="+edad.value);
+    request.send();
+    request.onreadystatechange = () => {
+        if (request.readyState === 4 && request.status === 200) {
+            modalpText.innerText = request.response;
+        }
+        else
+        {
+            modalpText.innerText = "Error en la conexión";
+        }
+    }
+    setTimeout(fn,300);
+}
+
+function mostrarModal(){
+    modalpName.innerText = nombre.value.concat(" ", apellido.value); //envia nombre y apellido registrados al modal
+    modal.classList.add("modal-show"); //muestra el modal
+    modalClose.onclick = function(){ //cuando se presiona el boton cerrar del modal
+        modal.classList.remove("modal-show"); //lo cierra
+    }
+    window.onclick = function(e) { //cuando se presiona cualquier parte fuera del modal
+        if (e.target == modal) {
+            modal.classList.remove("modal-show"); //lo cierra
+        }
     }
 }
